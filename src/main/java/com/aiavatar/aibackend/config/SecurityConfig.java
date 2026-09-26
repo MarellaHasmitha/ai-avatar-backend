@@ -32,6 +32,7 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
+
         return new BCryptPasswordEncoder();
     }
 
@@ -40,6 +41,7 @@ public class SecurityConfig {
             HttpSecurity http) throws Exception {
 
         http
+
             .csrf(csrf -> csrf.disable())
 
             .sessionManagement(session ->
@@ -56,11 +58,25 @@ public class SecurityConfig {
 
             .authorizeHttpRequests(auth -> auth
 
+                // Public authentication endpoints
                 .requestMatchers(
-                    "/api/users",
+                    "/api/auth/register",
                     "/api/auth/login"
                 ).permitAll()
 
+                // Swagger / OpenAPI endpoints
+                .requestMatchers(
+                    "/swagger-ui/**",
+                    "/swagger-ui.html",
+                    "/v3/api-docs/**"
+                ).permitAll()
+
+                // Existing public users endpoint
+                .requestMatchers(
+                    "/api/users"
+                ).permitAll()
+
+                // All other APIs require JWT
                 .anyRequest().authenticated()
             )
 
