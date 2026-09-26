@@ -1,46 +1,25 @@
 package com.aiavatar.aibackend.controller;
 
 import com.aiavatar.aibackend.service.ElevenLabsVoiceCloningService;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.Map;
 
 @RestController
-@RequestMapping("/api/voices")
+@RequestMapping("/api/voice")
+@ConditionalOnProperty(
+        name = "tts.provider",
+        havingValue = "elevenlabs"
+)
 public class VoiceCloneController {
 
-    private final ElevenLabsVoiceCloningService voiceCloningService;
+    private final ElevenLabsVoiceCloningService elevenLabsVoiceCloningService;
 
     public VoiceCloneController(
-            ElevenLabsVoiceCloningService voiceCloningService) {
+            ElevenLabsVoiceCloningService elevenLabsVoiceCloningService) {
 
-        this.voiceCloningService = voiceCloningService;
+        this.elevenLabsVoiceCloningService =
+                elevenLabsVoiceCloningService;
     }
 
-    @PostMapping("/clone")
-    public ResponseEntity<Map<String, String>> cloneVoice(
-            @RequestParam("name") String voiceName,
-            @RequestParam("file") MultipartFile audioFile,
-            Authentication authentication) {
-
-        String email = authentication.getName();
-
-        String voiceId =
-                voiceCloningService.cloneVoice(
-                        voiceName,
-                        audioFile
-                );
-
-        return ResponseEntity.ok(
-                Map.of(
-                        "message", "Voice cloned successfully",
-                        "user", email,
-                        "voiceId", voiceId
-                )
-        );
-    }
+    // KEEP YOUR EXISTING ENDPOINT METHODS HERE
 }
