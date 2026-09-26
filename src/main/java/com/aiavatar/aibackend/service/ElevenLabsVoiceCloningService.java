@@ -1,5 +1,6 @@
 package com.aiavatar.aibackend.service;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,10 @@ import java.io.IOException;
 import java.util.Map;
 
 @Service
+@ConditionalOnProperty(
+        name = "tts.provider",
+        havingValue = "elevenlabs"
+)
 public class ElevenLabsVoiceCloningService {
 
     private final RestClient elevenLabsRestClient;

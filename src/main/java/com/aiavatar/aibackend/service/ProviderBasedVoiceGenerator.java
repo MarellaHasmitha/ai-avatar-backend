@@ -1,6 +1,7 @@
 package com.aiavatar.aibackend.service;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,7 +13,7 @@ public class ProviderBasedVoiceGenerator implements VoiceGenerator {
 
     public ProviderBasedVoiceGenerator(
             CartesiaVoiceGenerator cartesiaVoiceGenerator,
-            ElevenLabsVoiceGenerator elevenLabsVoiceGenerator,
+            @Nullable ElevenLabsVoiceGenerator elevenLabsVoiceGenerator,
             @Value("${tts.provider}") String provider) {
 
         this.cartesiaVoiceGenerator = cartesiaVoiceGenerator;
@@ -32,6 +33,14 @@ public class ProviderBasedVoiceGenerator implements VoiceGenerator {
         }
 
         if ("elevenlabs".equalsIgnoreCase(provider)) {
+
+            if (elevenLabsVoiceGenerator == null) {
+                throw new IllegalStateException(
+                        "ElevenLabs provider is selected, "
+                                + "but ElevenLabsVoiceGenerator is not available. "
+                                + "Please configure ELEVENLABS_API_KEY."
+                );
+            }
 
             return elevenLabsVoiceGenerator.generateVoice(
                     text,

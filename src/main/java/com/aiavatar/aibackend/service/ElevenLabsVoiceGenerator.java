@@ -2,12 +2,17 @@ package com.aiavatar.aibackend.service;
 
 import java.util.Map;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 
 @Service
+@ConditionalOnProperty(
+        name = "tts.provider",
+        havingValue = "elevenlabs"
+)
 public class ElevenLabsVoiceGenerator {
 
     private final RestClient elevenLabsRestClient;
