@@ -1,148 +1,274 @@
+
 # AI Avatar Video Generation Backend
 
-A Spring Boot backend for generating AI-powered promotional videos from a user prompt.
+A Java Spring Boot REST API backend for generating AI-powered promotional videos from user prompts.
 
-The application generates an AI script, creates scene-wise narration, generates avatar or normal scene videos, processes them using FFmpeg, and merges all scenes into a final video.
+The application integrates multiple AI services to generate scripts, create scene-wise narration, produce AI-generated videos or avatar lip-sync videos, and combine individual scenes into a final video using FFmpeg.
+
+It also provides JWT-based authentication, user and project management, and PostgreSQL data persistence.
 
 ## Features
 
-- JWT Authentication
-- User and Project Management
-- AI Script & Scene Generation
-- Scene-wise Voice Generation
-- AI Scene Video Generation
-- Avatar/Lip-Sync Video Generation
-- FFmpeg Audio/Video Processing
-- Final Video Merging
-- PostgreSQL Database
-- Redis
-- Docker Support
-- REST APIs
+- **Authentication:** User registration, login and JWT-based authorization.
+- **Project Management:** Create, retrieve, update and delete projects.
+- **AI Script Generation:** Generate scripts and scene-wise content from user prompts.
+- **Voice Generation:** Generate narration for individual video scenes.
+- **AI Video Generation:** Generate videos for individual scenes.
+- **Avatar Integration:** Generate avatar-based lip-sync videos.
+- **Video Processing:** Process and merge audio and video using FFmpeg.
+- **Database:** Persist application data using PostgreSQL.
+- **API Documentation:** Interactive API documentation using Swagger / OpenAPI.
 
-## Video Generation Flow
+## Video Generation Workflow
+
 ```text
-User Prompt
-     ↓
-AI Script & Scenes
-     ↓
-Scene Narration
-     ↓
- ┌───────────────┬────────────────┐
- ↓               ↓
-Normal Video    Avatar Video
-(Pixazo)        (Sync Labs)
- └───────────────┴────────────────┘
-                 ↓
-              FFmpeg
-                 ↓
-            Final MP4
+             User Prompt
+                  |
+                  v
+          AI Script Generation
+                  |
+                  v
+          Scene-wise Generation
+                  |
+                  v
+           Voice Generation
+                  |
+                  v
+          Scene Audio Creation
+                  |
+                  v
+          Video Generation
+                  |
+          +-------+-------+
+          |               |
+          v               v
+      AI Scene Video   Avatar Video
+          |            (Lip-Sync)
+          |               |
+          +-------+-------+
+                  |
+                  v
+           FFmpeg Processing
+                  |
+                  v
+           Final MP4 Video
+```
 
+## Technology Stack
 
+| Category | Technologies |
+|---|---|
+| Language | Java 21 |
+| Backend Framework | Spring Boot |
+| Security | Spring Security, JWT |
+| ORM | Spring Data JPA, Hibernate |
+| Database | PostgreSQL |
+| Cache / Infrastructure | Redis |
+| Build Tool | Maven |
+| Containerization | Docker |
+| API Documentation | Swagger / OpenAPI |
+| API Testing | Postman |
+| Media Processing | FFmpeg |
 
+## AI Service Integrations
 
+The application integrates the following third-party services:
 
-**Tech Stack**
-Java 21
-Spring Boot
-Spring Security + JWT
-Spring Data JPA / Hibernate
-PostgreSQL
-Redis
-Docker
-FFmpeg
-Maven
-Postman
+| Service | Purpose |
+|---|---|
+| OpenRouter | AI script and scene generation |
+| Cartesia | Text-to-speech and voice generation |
+| Pixazo | AI scene video generation |
+| Sync Labs | Avatar lip-sync video generation |
+| FFmpeg | Audio/video processing and merging |
 
+### API Usage and Limitations
 
-**AI Services**
-OpenRouter – AI script and scene generation
-Cartesia – Scene narration/voice generation
-Pixazo – AI scene video generation
-Sync Labs – Avatar lip-sync video generation
-FFmpeg – Video and audio processing
+This project uses **free-tier APIs and services** for its AI integrations.
 
+- OpenRouter is used for AI-powered script generation.
+- Cartesia is used for voice generation.
+- Pixazo is used for AI video generation.
+- Sync Labs is used for avatar lip-sync generation.
 
-**Main APIs**
+These services have usage quotas and rate limits depending on their respective free-tier plans.
 
-POST /auth/register
-POST /auth/login
+The AI integrations were previously tested successfully. However, some generation features may temporarily be unavailable when the free API quotas are exhausted.
 
-POST /api/projects
-GET  /api/projects
+The core backend features, including authentication, JWT authorization and project management, can be tested independently of these external API limits.
 
-POST /api/projects/{projectId}/video-generations
+## API Documentation
 
-GET  /api/projects/{projectId}/video-generations/{videoGenerationId}/scenes
+The backend exposes REST APIs for authentication, project management and video generation.
 
-POST /api/projects/{projectId}/video-generations/{videoGenerationId}/scenes/{sceneId}/voice
+### Authentication
 
-POST /api/projects/{projectId}/video-generations/{videoGenerationId}/scenes/{sceneId}/video
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/users` | Register a new user |
+| POST | `/api/auth/login` | Authenticate and obtain JWT |
 
-POST /scenes/{sceneId}/avatar-video
+### Project Management
 
-POST /api/final-video/merge/{videoGenerationId}
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/projects` | Create a project |
+| GET | `/api/projects` | Retrieve projects |
+| GET | `/api/projects/{projectId}` | Retrieve project details |
+| PUT | `/api/projects/{projectId}` | Update a project |
+| DELETE | `/api/projects/{projectId}` | Delete a project |
 
+### Video Generation
 
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/projects/{projectId}/video-generations` | Create a video generation |
+| GET | `/api/projects/{projectId}/video-generations/{videoGenerationId}/scenes` | Retrieve video scenes |
+| POST | `/api/projects/{projectId}/video-generations/{videoGenerationId}/scenes/{sceneId}/voice` | Generate scene narration |
+| POST | `/api/projects/{projectId}/video-generations/{videoGenerationId}/scenes/{sceneId}/video` | Generate scene video |
+| POST | `/scenes/{sceneId}/avatar-video` | Generate avatar lip-sync video |
+| POST | `/api/final-video/merge/{videoGenerationId}` | Merge scenes into final video |
 
-**Testing**
+**Authentication:** Protected endpoints require a valid JWT Bearer token.
 
-The APIs can be tested using Postman.
-**Basic testing flow:
+```http
+Authorization: Bearer <your-jwt-token>
+```
 
-Register
-   ↓
-Login → Get JWT Token
-   ↓
-Create Project
-   ↓
-Create Video Generation
-   ↓
-Generate Scenes
-   ↓
-Generate Scene Audio
-   ↓
-Generate Scene/Avatar Videos
-   ↓
-Merge Final Video
-Database
+For complete request parameters, response formats and endpoint testing, refer to the Swagger documentation.
 
+## Database Structure
 
+The main entities represent the application's user and video generation workflow.
 
-****The main entities are:
-
+```text
 User
-  ↓
-Project
-  ↓
-VideoGeneration
-  ↓
-VideoScene
-Local Setup
-Requirements
-Java 21
-Maven
-Docker Desktop
-FFmpeg
+ |
+ +---- Project
+          |
+          +---- VideoGeneration
+                    |
+                    +---- VideoScene
+```
 
+PostgreSQL is used for persistent data storage.
 
-''''''Run Infrastructure
+## Running Locally
+
+### Prerequisites
+
+- Java 21
+- Maven
+- Docker Desktop
+- PostgreSQL
+- Redis
+- FFmpeg
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/MarellaHasmitha/ai-avatar-backend/
+cd <YOUR_PROJECT_FOLDER>
+```
+
+### 2. Configure Environment Variables
+
+Configure the required credentials and API keys through environment variables.
+
+The configuration includes:
+
+- PostgreSQL connection details
+- Redis connection details
+- JWT secret
+- OpenRouter API key
+- Cartesia API key
+- Pixazo API key
+- Sync Labs API key
+
+Use the environment variable names defined in the application configuration.
+
+**Never commit API keys, passwords or other sensitive credentials to GitHub.**
+
+### 3. Start PostgreSQL and Redis
+
+If the Docker containers have already been created:
+
+```bash
 docker start avatar-postgres
 docker start avatar-redis
-Run Application
+```
+
+Verify that the containers are running:
+
+```bash
+docker ps
+```
+
+### 4. Run the Application
+
+```bash
 mvn spring-boot:run
+```
 
-Backend:
-http://localhost:8081
+Alternatively, build the application:
 
-**Security**
-API keys and secrets must be provided through environment variables and must not be committed to GitHub.
+```bash
+mvn clean package
+```
 
+### 5. Access the Application
 
-''''Future Improvements
-Cloud storage
-Background video processing
-Job queues
-Video progress tracking
-Cloud deployment
-Automatic retries
-User video history
+| Resource | URL |
+|---|---|
+| Backend | http://localhost:8081 |
+| Swagger UI | http://localhost:8081/swagger-ui/index.html |
+| OpenAPI JSON | http://localhost:8081/v3/api-docs |
+
+## Testing
+
+The APIs can be tested using Swagger UI or Postman.
+
+Recommended testing sequence:
+
+1. Register a user.
+2. Log in and obtain a JWT token.
+3. Authorize protected endpoints using the token.
+4. Create and manage projects.
+5. Create a video generation.
+6. Generate scenes and narration.
+7. Generate scene or avatar videos.
+8. Merge the generated scenes into a final video.
+
+Core authentication, protected endpoints and project CRUD operations have been tested in the deployed environment.
+
+AI generation workflows were also tested previously, subject to third-party API availability and quotas.
+
+## Deployment
+
+The backend is deployed on Vercel.
+
+- **Backend:** https://ai-avatar-backend-eta.vercel.app/
+- **Swagger UI:** https://ai-avatar-backend-eta.vercel.app/swagger-ui/index.html
+- **OpenAPI Specification:** https://ai-avatar-backend-eta.vercel.app/v3/api-docs
+
+## Security
+
+- Passwords are hashed using BCrypt.
+- JWT authentication protects private endpoints.
+- Stateless authentication is implemented using Spring Security.
+- Sensitive credentials are managed through environment variables.
+
+## Future Enhancements
+
+- Cloud storage for generated videos
+- Asynchronous video processing
+- Background job queues
+- Video generation progress tracking
+- Automatic retry mechanisms
+- Video history and download management
+
+---
+
+**Author:** Hasmitha Marella
+
+**Technologies:** Java | Spring Boot | PostgreSQL | JWT | REST APIs | AI Integrations
