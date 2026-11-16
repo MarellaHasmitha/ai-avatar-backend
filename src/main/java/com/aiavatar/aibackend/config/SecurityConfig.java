@@ -60,6 +60,7 @@ public class SecurityConfig {
 
                 // Public authentication endpoints
                 .requestMatchers(
+                		"/",
                     "/api/auth/register",
                     "/api/auth/login"
                 ).permitAll()
